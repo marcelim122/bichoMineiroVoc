@@ -40,7 +40,7 @@ for i, imageFile in enumerate(ImagesTrain):
     
     label = np.reshape(label[:,:,0], (256, 256, 1))
     
-    label = label < 127
+    label = label > 1 #>=1, >1, >127 abordar colocar a borda no objeto ou retirar a borda do objeto
     
     x_all_train[i, :,:,:] = image
     y_all_train[i, :,:,:] = label
@@ -56,7 +56,7 @@ for i, imageFile in enumerate(ImagesVal):
     
     label = np.reshape(label[:,:,0], (256, 256, 1))
     
-    label = label < 127
+    label = label > 1
     
     x_all_val[i, :,:,:] = image
     y_all_val[i, :,:,:] = label
@@ -123,6 +123,7 @@ val_y = y_all_val
 epochs = 100
 n = 30
 x = 0
+qtdmodel = 0
 
 test_mask_train = np.ones((train_x.shape[0], 256, 256, 1))
 test_mask_val = np.ones((val_x.shape[0], 256, 256, 1))
@@ -158,8 +159,10 @@ for i in range(epochs):
         model.save('model.h5')
         max_acc_val = val_acc
         x = 0
+        qtdmodel = qtdmodel+1
         
     print('Train acc: %f, Val acc %f' %(train_acc, val_acc))
+    print('Quantidade de model novo: %d' %(qtdmodel))
     
     if (x == n) & (max_acc_val > val_acc):
         print('Model did not improve for %d epochs' %(n))
