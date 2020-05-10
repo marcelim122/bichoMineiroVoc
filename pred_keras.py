@@ -11,6 +11,7 @@ import imageio
 import numpy as np
 from sklearn.metrics import recall_score
 import glob 
+import matplotlib.pyplot as plt
 
 ImageTest = glob.glob('Teste/Images/*.png')
 ImagesLabel = glob.glob('Teste/Labels/*.png')
@@ -20,7 +21,7 @@ y_all_train = np.zeros((len(ImageTest), 256, 256, 1))
 for i, imageFile in enumerate(ImageTest):
     label = imageio.imread(ImagesLabel[i])
     label = np.reshape(label[:,:,0], (256, 256, 1))
-    label = label > 127
+    label = label >= 1
     y_all_train[i, :,:,:] = label
 
 model = tf.keras.models.load_model('model.h5')
@@ -32,17 +33,18 @@ FN = 0
 
 val_y = y_all_train
 
-save_dir = 'ResultFrame/'
+save_dir = 'Result/'
 
 for i, imageFile in enumerate(ImageTest):
     
     image = imageio.imread(imageFile)
-    folder_0,imageName = imageFile.split("\\")
+    #folder_0,imageName = imageFile.split("\\")
+    folde_0, folder_1, imageName = imageFile.split("/")
     image = np.reshape(image, (1, 256, 256, 3))
     image = image / 255.
     print(imageName)
-    result = model.predict([image, np.ones((1, 256, 256, 1))])
-    #result = model.predict([image])
+    #result = model.predict([image, np.ones((1, 256, 256, 1))])
+    result = model.predict([image])
     result = np.round(result)
     
     current_TP = np.count_nonzero(result * val_y[i, :, :, :])
